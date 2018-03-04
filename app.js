@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 require("./model/User");
 
 require("./routes/auth")(app);
-// require("./routes/anotherRoutes")(app);
+require("./routes/anotherRoutes")(app);
 
 app.listen(port, () => {
   console.log(`Server is running at port ${port}`);

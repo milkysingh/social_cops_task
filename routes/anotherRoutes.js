@@ -2,23 +2,23 @@ const authenticate = require("../middlewares/authenticate");
 const utils = require("../utils/util");
 const fs = require("fs");
 const jsonpatch = require("jsonpatch");
-const jimp = require("jimp");
-module.exports = app => {
-  app.get("/downloadThumbnail/*", authenticate, async (req, res) => {
+const winston = require("winston");
+
+module.exports = (app) => {
+  app.get("/downloadThumbnail/*", async (req, res) => {
     const imageUri = req.params["0"];
     try {
       const thumbnail = await utils.createThumbnail(imageUri);
       fs.readFile(thumbnail, (err, content) => {
         if (err) {
-          console.log("Err>>>>>>>", err);
-          throw err;
+          winston.log("error", err);
         }
         if (!err) {
           res.status(200).send(content);
         }
       });
     } catch (error) {
-      console.log("Err>>>>>>>", error);
+      winston.log("error", error);
       res.status(400).send(error);
     }
   });

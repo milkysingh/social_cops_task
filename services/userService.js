@@ -4,13 +4,13 @@ const config = require("../config/config");
 const MongoService = require("./mongoService");
 
 /**
- * @function <b>hashPasswordUsingBcrypt</b> <br>
+ * @function <b>hashPasswordUsingBcrypt</b><br>
  * Hash Password
  * @param {String} plainTextPassword Unsecured Password
  * @return {String} Secured Password
  */
-const hashPasswordUsingBcrypt = plainTextPassword => {
-  const saltRounds = config.saltRounds;
+const hashPasswordUsingBcrypt = (plainTextPassword) => {
+  const { saltRounds } = config;
 
   try {
     return bcrypt.hashSync(plainTextPassword, saltRounds);
@@ -20,34 +20,34 @@ const hashPasswordUsingBcrypt = plainTextPassword => {
 };
 
 /**
- * @function <b>comparePasswordUsingBcrypt</b><br>Verify Password
+ * @function <b>comparePasswordUsingBcrypt</b><br> Verify Password
  * @param {String} plainTextPassword Password to be checked
  * @param {String} passwordhash Hashed Password
  * @return {Boolean} True if match else False
  */
-const comparePasswordUsingBcrypt = (plainTextPassword, passwordhash) => {
-  return bcrypt.compare(plainTextPassword, passwordhash);
-};
+const comparePasswordUsingBcrypt = (plainTextPassword, passwordhash) =>
+  bcrypt.compare(plainTextPassword, passwordhash);
 
 /**
- * @function <b>generateAuthToken</b><br>Generate Token
+ * @function <b>generateAuthToken</b><br> Generate Token
  * @param {Object} criteriaForJwt keys for jwt to generate tokens
  * @return {String} Auth Token
  */
 
-const generateAuthToken = async criteriaForJwt => {
-  let condition, dataToUpdate;
+const generateAuthToken = async (criteriaForJwt) => {
+  let condition;
+  let dataToUpdate;
   const token = await jwt.sign(criteriaForJwt, config.jwtSecret);
   if (token) {
     condition = {
-      _id: criteriaForJwt.id
+      _id: criteriaForJwt.id,
     };
     dataToUpdate = {
-      $push: { tokens: { access: "auth", token: token } }
+      $push: { tokens: { access: "auth", token } },
     };
 
     try {
-      const user = await MongoService.updateUser(condition, dataToUpdate);
+      await MongoService.updateUser(condition, dataToUpdate);
       return token;
     } catch (error) {
       throw error;
@@ -56,13 +56,17 @@ const generateAuthToken = async criteriaForJwt => {
 };
 
 /**
- * @function <b>findByToken</b><br>Generate Token
- * @param {String} token Password to be checked
+ * @function <b>findByToken</b><br> decrypt Token
+ * @param {String} token token to be decrypt
  * @return {Object} if match returns user object
  */
-const findByToken = token => {
-  return jwt.verify(token, config.jwtSecret);
-};
+const findByToken = token => jwt.verify(token, config.jwtSecret);
+
+/**
+ * @function <b>findUser</b><br> Find User in Db
+ * @param {String} token Password to be checked
+ * @return {Object} if password macthes after decryption returns user object
+ */
 
 const findUser = async (userName, plainTextPassword) => {
   let user;
@@ -85,5 +89,5 @@ module.exports = {
   generateAuthToken,
   comparePasswordUsingBcrypt,
   hashPasswordUsingBcrypt,
-  findUser
+  findUser,
 };

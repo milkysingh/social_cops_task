@@ -1,9 +1,12 @@
 const UserServices = require("../services/userService");
 const MongoServices = require("../services/mongoService");
 const constants = require("../constants");
+
 const ERROR_MESSAGES = constants.errorResponse;
 const authenticate = require("../middlewares/authenticate");
-module.exports = app => {
+
+module.exports = (app) => {
+  // eslint-disable-next-line
   app.post("/signup", async (req, res) => {
     const { userName, password } = req.body;
 
@@ -13,20 +16,19 @@ module.exports = app => {
     if (userName === "" || (password && password === "")) {
       return res.status(400).send({ error: "Missing Credentials" });
     }
-    const encryptPassword = await UserServices.hashPasswordUsingBcrypt(
-      password
-    );
+    const encryptPassword = await UserServices.hashPasswordUsingBcrypt(password);
 
     const data = {
       userName,
-      password: encryptPassword
+      password: encryptPassword,
     };
     let user;
     try {
       user = await MongoServices.createNewUser(data);
       const criteriaForJWT = {
+        // eslint-disable-next-line
         id: user._id,
-        date: new Date()
+        date: new Date(),
       };
       const token = await UserServices.generateAuthToken(criteriaForJWT);
       if (token) {
@@ -47,8 +49,9 @@ module.exports = app => {
 
     if (user) {
       const criteriaForJWT = {
+        // eslint-disable-next-line
         id: user._id,
-        date: new Date()
+        date: new Date(),
       };
       const token = await UserServices.generateAuthToken(criteriaForJWT);
 

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { ObjectID } = require("mongodb");
 const mongoose = require("mongoose");
+
 const User = mongoose.model("users");
 const userService = require("../services/userService");
 const config = require("../config/config");
@@ -15,18 +16,18 @@ const users = [
     tokens: [
       {
         access: "auth",
-        token: jwt.sign({ _id: userOne }, config.jwtSecret)
-      }
-    ]
+        token: jwt.sign({ _id: userOne }, config.jwtSecret),
+      },
+    ],
   },
   {
     _id: userTwo,
     userName: "milkysingh",
-    password: userService.hashPasswordUsingBcrypt("malkeet")
-  }
+    password: userService.hashPasswordUsingBcrypt("malkeet"),
+  },
 ];
 
-const populateUsers = done => {
+const populateUsers = (done) => {
   User.remove({})
     .then(() => {
       const user1 = new User(users[0]).save();
@@ -37,5 +38,5 @@ const populateUsers = done => {
 };
 module.exports = {
   populateUsers,
-  users
+  users,
 };
